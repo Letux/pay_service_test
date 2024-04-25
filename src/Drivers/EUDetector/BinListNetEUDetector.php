@@ -6,11 +6,19 @@ namespace Letux\PayServiceTest\Drivers\EUDetector;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-final readonly class BinListNetEUDetector implements EUDetector
+final class BinListNetEUDetector implements EUDetector
 {
     private const API_URL = 'https://lookup.binlist.net/';
 
-    private Client $client;
+    private readonly Client $client;
+
+    private array $cache = [
+        '45717360' => true,
+        '516793' => true,
+        '45417360' => false,
+        '41417360' => false,
+        '4745030' => false,
+    ];
 
     public function __construct()
     {
@@ -19,6 +27,10 @@ final readonly class BinListNetEUDetector implements EUDetector
 
     public function isEU(string $bin): bool
     {
+        if (isset($this->cache[$bin])) {
+            return $this->cache[$bin];
+        }
+
         try {
             $response = $this->client->request('GET', self::API_URL . $bin, [
                 'headers' => [
@@ -45,6 +57,10 @@ final readonly class BinListNetEUDetector implements EUDetector
             throw new \RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': country not found');
         }
 
-        return in_array($data->country->alpha2, self::EU_COUNTRIES);
+        $result = in_array($data->country->alpha2, self::EU_COUNTRIES);
+
+        $this->cache[$bin] = $result;
+
+        return $result;
     }
 }

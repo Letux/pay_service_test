@@ -6,20 +6,26 @@ namespace Letux\PayServiceTest\Drivers\Rate;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-final readonly class ExchangeRatesAPIIO implements Rate
+final class ExchangeRatesAPIIO implements Rate
 {
     private const string API_URL = 'https://api.apilayer.com/exchangerates_data/latest';
     private const string DEFAULT_CURRENCY = 'EUR';
 
-    private Client $client;
+    private readonly Client $client;
 
-    public function __construct(private string $token)
+    private array $cache;
+
+    public function __construct(private readonly string $token)
     {
         $this->client = new Client();
     }
 
     public function getRate(string $currency): float
     {
+        if (!empty($this->cache[$currency])) {
+            return $this->cache[$currency];
+        }
+
         try {
             $response = $this->client->request('GET', self::API_URL, [
                 'query' => [
@@ -54,6 +60,8 @@ final readonly class ExchangeRatesAPIIO implements Rate
             throw new \RuntimeException('api.exchangeratesapi.io error: currency not found');
         }
 
-        return $data->rates->{$currency};
+        $this->cache = (array) $data->rates;
+
+        return $this->cache[$currency];
     }
 }

@@ -26,7 +26,7 @@ final readonly class CommissionService
         $transactions = $this->reader->getTransactions();
 
         foreach ($transactions as $transaction) {
-            echo $this->getTransactionCommission($transaction) . PHP_EOL;
+            echo number_format($this->getTransactionCommission($transaction), 2) . PHP_EOL;
         }
     }
 
