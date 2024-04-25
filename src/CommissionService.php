@@ -2,6 +2,7 @@
 
 namespace Letux\PayServiceTest;
 
+use Letux\PayServiceTest\Drivers\EUDetector\EUDetector;
 use Letux\PayServiceTest\Drivers\Rate\Rate;
 use Letux\PayServiceTest\Drivers\SourceData\SourceData;
 use Letux\PayServiceTest\DTOs\TransactionDTO;
@@ -14,7 +15,7 @@ final readonly class CommissionService
     public function __construct(
         private SourceData $reader,
         private Rate $rate,
-
+        private EUDetector $euDetector
     )
     {
     }
@@ -34,7 +35,7 @@ final readonly class CommissionService
 
         $amountInEUR = $this->getAmountInEUR($transaction->amount, $rate, $transaction->currency);
 
-        $isEU = $this->isEU($transaction->bin);
+        $isEU = $this->euDetector->isEU($transaction->bin);
 
         return $this->getCommission($amountInEUR, $isEU);
     }
@@ -51,14 +52,5 @@ final readonly class CommissionService
     private function getCommission(float $amountInEUR, bool $isEu): float
     {
         return $amountInEUR * ($isEu ? self::EU_MULTIPLIER : self::NON_EU_MULTIPLIER);
-    }
-
-    private function isEU(string $bin)
-    {
-        $binResults = file_get_contents('https://lookup.binlist.net/' .$bin);
-        if (!$binResults)
-            die('error!');
-        $r = json_decode($binResults);
-        return in_array($r->country->alpha2, self::EU_COUNTRIES);
     }
 }
