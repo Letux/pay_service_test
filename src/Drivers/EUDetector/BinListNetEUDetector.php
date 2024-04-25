@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Letux\PayServiceTest\Drivers\EUDetector;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use http\Exception\RuntimeException;
 
 final readonly class BinListNetEUDetector implements EUDetector
 {
@@ -26,21 +26,23 @@ final readonly class BinListNetEUDetector implements EUDetector
                 ],
             ]);
         } catch (GuzzleException $e) {
-            throw new RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': ' . $e->getMessage());
+            throw new \RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': ' . $e->getMessage());
         }
 
         if ($response->getStatusCode() !== 200) {
-            throw new RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': ' . $response->getReasonPhrase());
+            throw new \RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': ' . $response->getReasonPhrase());
         }
 
-        if (!json_validate($response->getBody()->getContents())) {
-            throw new RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': invalid JSON');
+        $responseText = $response->getBody()->getContents();
+
+        if (!json_validate($responseText)) {
+            throw new \RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': invalid JSON');
         }
 
-        $data = json_decode($response->getBody()->getContents());
+        $data = json_decode($responseText);
 
         if (!isset($data->country->alpha2)) {
-            throw new RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': country not found');
+            throw new \RuntimeException('BinListNetEUDetector error while checking ' .  $bin . ': country not found');
         }
 
         return in_array($data->country->alpha2, self::EU_COUNTRIES);

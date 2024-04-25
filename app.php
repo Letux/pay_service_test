@@ -19,7 +19,7 @@ $dotenv->required(['API_LAYER_TOKEN']);
 
 $service = new CommissionService(
     new FileDataReader($argv[1]),
-    new ExchangeRatesAPIIO(getenv('API_LAYER_TOKEN')),
+    new ExchangeRatesAPIIO($_ENV['API_LAYER_TOKEN']),
     new BinListNetEUDetector()
 );
 

@@ -14,7 +14,7 @@ final readonly class FileDataReader implements SourceData
     /**
      * @return iterable<TransactionDTO>
      */
-    public function getData(): iterable
+    public function getTransactions(): iterable
     {
         $handle = fopen($this->filename, 'r');
 

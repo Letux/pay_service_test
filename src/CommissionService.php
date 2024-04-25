@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Letux\PayServiceTest;
 
@@ -9,8 +10,8 @@ use Letux\PayServiceTest\DTOs\TransactionDTO;
 
 final readonly class CommissionService
 {
-    private const EU_MULTIPLIER = 0.01;
-    private const NON_EU_MULTIPLIER = 0.02;
+    private const float EU_MULTIPLIER = 0.01;
+    private const float NON_EU_MULTIPLIER = 0.02;
 
     public function __construct(
         private SourceData $reader,
@@ -22,7 +23,7 @@ final readonly class CommissionService
 
     public function handle(): void
     {
-        $transactions = $this->reader->getData();
+        $transactions = $this->reader->getTransactions();
 
         foreach ($transactions as $transaction) {
             echo $this->getTransactionCommission($transaction) . PHP_EOL;

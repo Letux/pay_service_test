@@ -9,5 +9,5 @@ interface SourceData
     /**
      * @return iterable<TransactionDTO>
      */
-    public function getData(): iterable;
+    public function getTransactions(): iterable;
 }
