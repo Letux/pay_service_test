@@ -20,9 +20,9 @@ final class BinListNetEUDetector implements EUDetector
         '4745030' => false,
     ];
 
-    public function __construct()
+    public function __construct(Client $client = null)
     {
-        $this->client = new Client();
+        $this->client = $client ?? new Client();
     }
 
     public function isEU(string $bin): bool

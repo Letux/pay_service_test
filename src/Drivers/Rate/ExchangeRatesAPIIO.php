@@ -15,9 +15,9 @@ final class ExchangeRatesAPIIO implements Rate
 
     private array $cache;
 
-    public function __construct(private readonly string $token)
+    public function __construct(private readonly string $token, Client $client = null)
     {
-        $this->client = new Client();
+        $this->client = $client ?? new Client();
     }
 
     public function getRate(string $currency): float
@@ -57,7 +57,7 @@ final class ExchangeRatesAPIIO implements Rate
         }
 
         if (!isset($data->rates->{$currency})) {
-            throw new \RuntimeException('api.exchangeratesapi.io error: currency not found');
+            throw new \RuntimeException("api.exchangeratesapi.io error: currency $currency not found");
         }
 
         $this->cache = (array) $data->rates;
