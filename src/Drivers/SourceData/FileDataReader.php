@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Letux\PayServiceTest\Drivers\SourceData;
 
-use Letux\PayServiceTest\SourceDataDTO;
+use Letux\PayServiceTest\DTOs\TransactionDTO;
 
 final readonly class FileDataReader implements SourceData
 {
@@ -12,7 +12,7 @@ final readonly class FileDataReader implements SourceData
     }
 
     /**
-     * @return iterable<SourceDataDTO>
+     * @return iterable<TransactionDTO>
      */
     public function getData(): iterable
     {
@@ -41,7 +41,7 @@ final readonly class FileDataReader implements SourceData
                 throw new \RuntimeException('Invalid JSON structure in line ' . $i);
             }
 
-            yield new SourceDataDTO($row->bin, $row->amount, $row->currency);
+            yield new TransactionDTO($row->bin, $row->amount, $row->currency);
         }
 
         fclose($handle);
